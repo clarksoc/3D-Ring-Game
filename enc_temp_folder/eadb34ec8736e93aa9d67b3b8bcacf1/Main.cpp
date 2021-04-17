@@ -40,7 +40,6 @@ int score = 0;
 int speed = 1000;
 bool showStartText = true;
 bool showScore = false;
-bool gameOver = false;
 
 void chooseScreenCallback();
 void startScreenCallback();
@@ -147,41 +146,7 @@ int InitScene(void)
 
 	return GL_TRUE;
 }
-
-
-void startScreenCallback(void) {
-
-	int iViewport[4];
-
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	glLoadIdentity();
-
-	glTranslatef(0.0f, -2.0f, -camera.fRadius);
-	glRotatef(camera.vecRot.x + 0.1f, 1.0f, 0.0f, 0.0f);
-	glColor3f(0.0f, 0.0f, 1.0f);
-	glutSolidSphere(1.0f, 32, 32);
-
-	glRotatef(camera.vecRot.y, 0.0f, 1.0f, 0.0f);
-	glTranslatef(-camera.vecPos.x, -camera.vecPos.y, -camera.vecPos.z);
-	glGetIntegerv(GL_VIEWPORT, iViewport);
-
-	floor_render(50.0f, -0.75f);
-
-	glColor3f(0.0f, 0.0f, 1.0f);
-	const unsigned char* welcomeMessage = (const unsigned char*)("Welcome to 3D Game Go Burrrrrr \nUse W A S D to move Sanic through the answer rings \nAnswer questions correctly to earn points! \n\n Press Space to Start the Game!!!");
-
-	glColor3f(1.0, 1.0, 1.0);
-	glRasterPos3f(-1.0, 5.0, 0.0);
-	glutBitmapString(GLUT_BITMAP_HELVETICA_18, welcomeMessage);
-	glPopMatrix();
-	glutTimerFunc(10000, showTextTimer, 0);
-
-	glutSwapBuffers();
-
-}
-
-void gameStateFunction(void)
+void DisplayFunction(void)
 {
 	int iViewport[4];
 
@@ -215,68 +180,9 @@ void gameStateFunction(void)
 	glRasterPos3f(camera.vecPos.x + 1.0f, camera.vecPos.y + 1.0f, camera.vecPos.z + 1.0f);
 	glutBitmapString(GLUT_BITMAP_HELVETICA_18, reinterpret_cast<const unsigned char*>(messageInGame));
 
-	if (gameOver) {
-		glutDisplayFunc(gameOverScreenCallback);
-	}
-
 	glutSwapBuffers();
 	angle += 1.0f;
 }
-
-void gameOverScreenCallback(void) {
-
-	int iViewport[4];
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	glLoadIdentity();
-
-	glTranslatef(0.0f, -2.0f, -camera.fRadius);
-	glRotatef(camera.vecRot.x + 0.1f, 1.0f, 0.0f, 0.0f);
-	glColor3f(0.0f, 0.0f, 1.0f);
-	glutSolidSphere(1.0f, 32, 32);
-
-	glRotatef(camera.vecRot.y, 0.0f, 1.0f, 0.0f);
-	glTranslatef(-camera.vecPos.x, -camera.vecPos.y, -camera.vecPos.z);
-	glGetIntegerv(GL_VIEWPORT, iViewport);
-
-	floor_render(50.0f, -0.75f);
-
-	glColor3f(0.0f, 0.0f, 1.0f);
-
-
-	char finalScore[10] = { 0 };
-	string endGameMessage;
-	string pressR = "\nPress R to play again!";
-	string outOf = "/25";
-
-
-	_itoa_s(score, finalScore, 10);
-
-	if (score < 10) {
-
-		endGameMessage = "You need to work on your math skills! \nYour Final Score was: ";
-
-	}
-	else if (score < 20) {
-
-		endGameMessage = "That was pretty good! \nYour Final Score was: ";
-
-	}
-	else {
-		endGameMessage = "Perfect Score! \nYour Final Score was: ";
-	}
-
-	endGameMessage = endGameMessage + std::to_string(score) + outOf + pressR;
-
-	glColor3f(1.0, 1.0, 1.0);
-	glRasterPos3f(-1.0, 5.0, 0.0);
-	glutBitmapString(GLUT_BITMAP_HELVETICA_18, (const unsigned char*)endGameMessage.c_str());
-	glPopMatrix();
-	glutTimerFunc(10000, showTextTimer, 0);
-
-	glutSwapBuffers();
-
-}
-
 void MouseFunction(int x, int y)
 {
 
@@ -317,10 +223,6 @@ void KeyboardFunction(GLubyte k, int x, int y)
 	{
 		camera.vecRot.x -= 1;
 		if (camera.vecRot.x < -360) camera.vecRot.x += 360;
-	}
-	if ((GetKeyState(0x52) & 0x8000))//R
-	{
-		//TODO: Reset everything
 	}
 	if ((GetKeyState(VK_SPACE) & 0x8000)) { //SPACE
 		startScreen = false;
@@ -484,13 +386,44 @@ void ReshapeFunction(GLsizei width, GLsizei height)
 	glLoadIdentity();
 }
 
+void startScreenCallback(void) {
+	
+	int iViewport[4];
+
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	glLoadIdentity();
+
+	glTranslatef(0.0f, -2.0f, -camera.fRadius);
+	glRotatef(camera.vecRot.x + 0.1f, 1.0f, 0.0f, 0.0f);
+	glColor3f(0.0f, 0.0f, 1.0f);
+	glutSolidSphere(1.0f, 32, 32);
+
+	glRotatef(camera.vecRot.y, 0.0f, 1.0f, 0.0f);
+	glTranslatef(-camera.vecPos.x, -camera.vecPos.y, -camera.vecPos.z);
+	glGetIntegerv(GL_VIEWPORT, iViewport);
+
+	floor_render(50.0f, -0.75f);
+
+	glColor3f(0.0f, 0.0f, 1.0f);
+	const unsigned char* welcomeMessage = (const unsigned char*)("Welcome to 3D Game Go Burrrrrr \nUse W A S D to move Sanic through the answer rings \nAnswer questions correctly to earn points! \n\n Press Space to Start the Game!!!");
+
+	glColor3f(1.0, 1.0, 1.0);
+	glRasterPos3f(-1.0, 5.0, 0.0);
+	glutBitmapString(GLUT_BITMAP_HELVETICA_18, welcomeMessage);
+	glPopMatrix();
+	glutTimerFunc(10000, showTextTimer, 0);
+
+	glutSwapBuffers();
+
+}
 
 void chooseScreenCallback() {
 	if (startScreen) {
 		glutDisplayFunc(startScreenCallback);
 	}
 	else {
-		glutDisplayFunc(gameStateFunction);
+		glutDisplayFunc(DisplayFunction);
 	}
 }
 
@@ -502,7 +435,7 @@ int main(int argc, char* argv[])
 	glutCreateWindow("3D Game Go Burrrrrrrrrrrrrrrrrrrrrrrrrrr");
 	InitScene();
 	makeDonuts(0.0, 0.0);
-	//glutDisplayFunc(gameStateFunction);
+	//glutDisplayFunc(DisplayFunction);
 	chooseScreenCallback();
 	glutKeyboardFunc(KeyboardFunction);
 	glutPassiveMotionFunc(MouseFunction);

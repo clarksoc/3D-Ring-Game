@@ -17,135 +17,6 @@
 //
 //#define FRAMES 30
 //
-//struct Vector3
-//{
-//    float x, y, z;
-//};
-//
-//struct ThirdPersonCamera_t
-//{
-//    struct Vector3 vecPos;
-//    struct Vector3 vecRot;
-//    float fRadius;			// Distance between the camera and the object.
-//    float fLastX;
-//    float fLastY;
-//};
-//
-//struct ThirdPersonCamera_t camera;
-//
-//
-//float distance(const struct Vector3* v1, const struct Vector3* v2)
-//{
-//    float d = 0.0f;
-//    float x = v2->x - v1->x;
-//    float y = v2->y - v1->y;
-//    float z = v2->z - v1->z;
-//
-//    x *= x;
-//    y *= y;
-//    z *= z;
-//
-//    d = sqrt(x + y + z);
-//
-//    return d;
-//}
-//
-//void calculate_distances(void)
-//{
-//    int i;
-//    struct Vector3 neg_camera;
-//
-//    // In order to accurately calculate the distance between the spheres and 
-//    // the camera, the x and z values should be converted to negatives, and
-//    // the y coordinate should be ignored.  The camera updates the y value 
-//    // still, but in a 3rd person shooter/adventure style game, the is calc-
-//    // lations are done seperately from the camera to compensate for jumping
-//    // and gravity, etc.
-//    neg_camera.x = camera.vecPos.x * -1.0f;
-//    neg_camera.y = 0.0f;
-//    neg_camera.z = camera.vecPos.z * -1.0f;
-//
-//    //for (i = 0; i < sphere_count; i++)
-//    //{
-//    //    spheres[i].distance = distance(&neg_camera, &spheres[i].position);
-//    //}
-//}
-//
-//void draw_axes(void)
-//{
-//    glPushAttrib(GL_ALL_ATTRIB_BITS);
-//    glDisable(GL_LIGHTING);
-//    glEnable(GL_LINE_SMOOTH);
-//
-//    glPushMatrix();
-//    glTranslatef(0.0f, 0.0f, 0.0f);
-//
-//    glBegin(GL_LINES);
-//
-//    // X Axis (Red)
-//    glColor3f(1.0f, 0.0f, 0.0f);
-//    glVertex3f(0.0f, 0.0f, 0.0f);
-//    glVertex3f(2.0f, 0.0f, 0.0f);
-//
-//    // Y Axis (Green)
-//    glColor3f(0.0f, 1.0f, 0.0f);
-//    glVertex3f(0.0f, 0.0f, 0.0f);
-//    glVertex3f(0.0f, 2.0f, 0.0f);
-//
-//    // Z Axis (Blue)
-//    glColor3f(0.0f, 0.0f, 1.0f);
-//    glVertex3f(0.0f, 0.0f, 0.0f);
-//    glVertex3f(0.0f, 0.0f, 2.0f);
-//
-//    glEnd();
-//
-//    glPopMatrix();
-//
-//    glPopAttrib();
-//}
-//
-//void show_camera_stats(void)
-//{
-//    char string[128];
-//
-//    sprintf(string, "Camera <%f,%f,%f>", camera.vecPos.x, camera.vecPos.y, camera.vecPos.z);
-//    //glPrintf(30, 30, GLUT_BITMAP_9_BY_15, string);
-//}
-//int glh_extension_supported(const char* extension)
-//{
-//    static const GLubyte* extensions = NULL;
-//    const GLubyte* start;
-//    GLubyte* where, * terminator;
-//
-//    // Extension names should not have spaces. 
-//    where = (GLubyte*)strchr(extension, ' ');
-//    if (where || *extension == '\0')
-//        return 0;
-//
-//    if (!extensions)
-//        extensions = glGetString(GL_EXTENSIONS);
-//
-//    // It takes a bit of care to be fool-proof about parsing the
-//    // OpenGL extensions string.  Don't be fooled by sub-strings,
-//    // etc.
-//    start = extensions;
-//    for (;;)
-//    {
-//        where = (GLubyte*)strstr((const char*)start, extension);
-//        if (!where)
-//            break;
-//        terminator = where + strlen(extension);
-//        if (where == start || *(where - 1) == ' ')
-//        {
-//            if (*terminator == ' ' || *terminator == '\0')
-//            {
-//                return 1;
-//            }
-//        }
-//        start = terminator;
-//    }
-//    return 0;
-//}
 //
 //char title[] = "3D Shapes";
 //GLfloat anglePyramid = 0.0f;
@@ -342,7 +213,7 @@
 //    glutTimerFunc(1000/FRAMES, framesCallback, 0);
 //
 //}
-
+//
 //int main(int argc, char** argv)
 //{
 //
@@ -362,4 +233,165 @@
 //    glutMainLoop();
 //    return 0;
 //}
+/*
+#include <windows.h>
+#include <GL/gl.h>
+#include <GL/glut.h>
+#include <stdlib.h>
+#include <math.h>
+float xpos = 0, ypos = 0, zpos = 0, xrot = 0, yrot = 0, angle = 0.0;
 
+float cRadius = 10.0f;
+float lastx, lasty;
+float positionz[10];
+float positionx[10];
+
+void cubepositions(void) { //set the positions of the cubes
+
+    for (int i = 0; i < 10; i++)
+    {
+        positionz[i] = rand() % 5 + 1;
+        positionx[i] = rand() % 5 + 1;
+    }
+}
+
+void cube(void) {
+    for (int i = 0; i < 9; i++)
+    {
+        glPushMatrix();
+        glTranslated(-positionx[i + 1] * 10, 0, -positionz[i + 1] * 10);
+        glutSolidCube(2);
+        glPopMatrix();
+    }
+}
+
+void init(void) {
+    cubepositions();
+}
+
+void enable(void) {
+    glEnable(GL_DEPTH_TEST); //enable the depth testing
+    glEnable(GL_LIGHTING); //enable the lighting
+    glEnable(GL_LIGHT0); //enable LIGHT0, our Diffuse Light
+    glEnable(GL_COLOR_MATERIAL);
+    glShadeModel(GL_SMOOTH); //set the shader to smooth shader
+
+}
+
+void display() {
+    glClearColor(0.0, 0.0, 0.0, 1.0); //clear the screen to 
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //clear the color buffer and the depth buffer
+    enable();
+
+    glLoadIdentity();
+
+    glTranslatef(0.0f, 0.0f, -cRadius);
+    glRotatef(xrot, 1.0, 0.0, 0.0);
+    glColor3f(1.0f, 0.0f, 0.0f);
+    glutSolidCube(2);
+
+    glRotatef(yrot, 0.0, 1.0, 0.0);
+    glTranslated(-xpos, 0.0f, -zpos);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    cube();
+
+    glutSwapBuffers();
+    angle++;
+}
+
+void reshape(int w, int h) {
+    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
+    glMatrixMode(GL_PROJECTION);
+
+    glLoadIdentity();
+    gluPerspective(60, (GLfloat)w / (GLfloat)h, 0.1, 100.0);
+    glMatrixMode(GL_MODELVIEW);
+
+}
+
+void keyboard(unsigned char key, int x, int y) {
+    if ((GetKeyState(0x51) & 0x8000))
+    {
+        xrot += 1;
+        if (xrot > 360) {
+            xrot -= 360;
+        }
+    }
+
+    if ((GetKeyState(0x45) & 0x8000))
+    {
+        xrot -= 1;
+        if (xrot < -360) xrot += 360;
+    }
+
+    if ((GetKeyState(0x53) & 0x8000))
+    {
+        float xrotrad, yrotrad;
+        yrotrad = (yrot / 180 * 3.141592654f);
+        xrotrad = (xrot / 180 * 3.141592654f);
+        xpos += float(sin(yrotrad));
+        zpos -= float(cos(yrotrad));
+        ypos -= float(sin(xrotrad));
+    }
+
+    if ((GetKeyState(0x57) & 0x8000))
+    {
+        float xrotrad, yrotrad;
+        yrotrad = (yrot / 180 * 3.141592654f);
+        xrotrad = (xrot / 180 * 3.141592654f);
+        xpos -= float(sin(yrotrad));
+        zpos += float(cos(yrotrad));
+        ypos += float(sin(xrotrad));
+    }
+
+    if ((GetKeyState(0x44) & 0x8000))
+    {
+        float yrotrad;
+        yrotrad = (yrot / 180 * 3.141592654f);
+        xpos += float(cos(yrotrad)) * 0.2;
+        zpos += float(sin(yrotrad)) * 0.2;
+    }
+
+    if ((GetKeyState(0x41) & 0x8000))
+    {
+        float yrotrad;
+        yrotrad = (yrot / 180 * 3.141592654f);
+        xpos -= float(cos(yrotrad)) * 0.2;
+        zpos -= float(sin(yrotrad)) * 0.2;
+    }
+
+    if (key == 27)
+    {
+        exit(0);
+    }
+}
+
+void mouseMovement(int x, int y) {
+    int diffx = x - lastx;
+    int diffy = y - lasty;
+    lastx = x;
+    lasty = y;
+    xrot += (float)diffy;
+    yrot += (float)diffx;
+}
+
+int main(int argc, char** argv) {
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH);
+    glutInitWindowSize(900, 900);
+    glutInitWindowPosition(100, 100);
+    glutCreateWindow("3D Game Go BURRRRRRRRRRRRRRRR");
+    init();
+    glutDisplayFunc(display);
+    glutIdleFunc(display);
+    glutReshapeFunc(reshape);
+
+    //glutPassiveMotionFunc(mouseMovement);
+
+    glutKeyboardFunc(keyboard);
+    glutMainLoop();
+    return 0;
+}
+*/
