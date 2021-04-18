@@ -143,8 +143,6 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Ring.cpp" />
     <ClCompile Include="Stars.cpp" />
-    <ClCompile Include="StartScreen.cpp" />
-    <ClCompile Include="Test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Rocket_ply\Rocket.ply" />
@@ -153,7 +151,6 @@
   <ItemGroup>
     <ClInclude Include="Ring.h" />
     <ClInclude Include="Stars.h" />
-    <ClInclude Include="StartScreen.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

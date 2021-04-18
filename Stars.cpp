@@ -55,7 +55,7 @@ void drawPlanet() {
 }
 
 void drawStars() {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glDepthMask(GL_FALSE);
     glDisable(GL_DEPTH_TEST);

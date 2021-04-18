@@ -12,7 +12,6 @@
 
 #include "Stars.h"
 #include "Ring.h"
-#include "StartScreen.h"
 
 using namespace std;
 
@@ -34,13 +33,13 @@ struct ThirdPersonCamera_t camera;
 GLuint floor_tex = 0;
 GLfloat angle = 45.0f;
 int refreshMill = 1;
-bool gameOver = false;
 bool startScreen = true;
 int score = 0;
 int speed = 1000;
 bool showStartText = true;
 bool showScore = false;
 bool gameOver = false;
+extern string question;
 
 void chooseScreenCallback();
 void startScreenCallback();
@@ -176,7 +175,7 @@ void startScreenCallback(void) {
 	glutBitmapString(GLUT_BITMAP_HELVETICA_18, welcomeMessage);
 	glPopMatrix();
 	glutTimerFunc(10000, showTextTimer, 0);
-
+	//makeDonuts(camera.vecPos.x, camera.vecPos.z);
 	glutSwapBuffers();
 
 }
@@ -185,14 +184,16 @@ void gameStateFunction(void)
 {
 	int iViewport[4];
 
-
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	glLoadIdentity();
+	GLfloat qaSpecularLight[] = { 1.0, 1.0, 1.0, 1.0 };
+	glLightfv(GL_LIGHT0, GL_SPECULAR, qaSpecularLight);
 
 	glTranslatef(0.0f, -2.0f, -camera.fRadius);
 	glRotatef(camera.vecRot.x + 0.1f, 1.0f, 0.0f, 0.0f);
 	glColor3f(0.0f, 0.0f, 1.0f);
 	glutSolidSphere(1.0f, 32, 32);
+
 
 	glRotatef(camera.vecRot.y, 0.0f, 1.0f, 0.0f);
 	glTranslatef(-camera.vecPos.x, -camera.vecPos.y, -camera.vecPos.z);
@@ -214,6 +215,9 @@ void gameStateFunction(void)
 	glColor3f(1.0, 1.0, 1.0);
 	glRasterPos3f(camera.vecPos.x + 1.0f, camera.vecPos.y + 1.0f, camera.vecPos.z + 1.0f);
 	glutBitmapString(GLUT_BITMAP_HELVETICA_18, reinterpret_cast<const unsigned char*>(messageInGame));
+
+	glRasterPos3f(camera.vecPos.x - 1.0f, camera.vecPos.y + 2.0f, camera.vecPos.z + 1.0f);
+	glutBitmapString(GLUT_BITMAP_HELVETICA_18, (const unsigned char*)question.c_str());
 
 	if (gameOver) {
 		glutDisplayFunc(gameOverScreenCallback);
@@ -256,7 +260,7 @@ void gameOverScreenCallback(void) {
 		endGameMessage = "You need to work on your math skills! \nYour Final Score was: ";
 
 	}
-	else if (score < 20) {
+	else if (score < 25) {
 
 		endGameMessage = "That was pretty good! \nYour Final Score was: ";
 
@@ -275,6 +279,13 @@ void gameOverScreenCallback(void) {
 
 	glutSwapBuffers();
 
+}
+
+void resetGameState() {
+	gameOver = false;
+	startScreen = true;
+	score = 0;
+	chooseScreenCallback();
 }
 
 void MouseFunction(int x, int y)
@@ -321,10 +332,12 @@ void KeyboardFunction(GLubyte k, int x, int y)
 	if ((GetKeyState(0x52) & 0x8000))//R
 	{
 		//TODO: Reset everything
+		resetGameState();
 	}
 	if ((GetKeyState(VK_SPACE) & 0x8000)) { //SPACE
 		startScreen = false;
 		chooseScreenCallback();
+		
 
 	}
 	if ((GetKeyState(0x58) & 0x8000)) { //X
@@ -366,7 +379,6 @@ void KeyboardFunction(GLubyte k, int x, int y)
 		if (camera.vecPos.z >= 50) {
 			camera.vecPos.z -= 0.5;
 		}
-		cout << camera.vecPos.x << endl;
 
 
 
@@ -488,6 +500,7 @@ void ReshapeFunction(GLsizei width, GLsizei height)
 void chooseScreenCallback() {
 	if (startScreen) {
 		glutDisplayFunc(startScreenCallback);
+		makeDonuts(camera.vecPos.x, camera.vecPos.z);
 	}
 	else {
 		glutDisplayFunc(gameStateFunction);
@@ -501,8 +514,6 @@ int main(int argc, char* argv[])
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGBA);
 	glutCreateWindow("3D Game Go Burrrrrrrrrrrrrrrrrrrrrrrrrrr");
 	InitScene();
-	makeDonuts(0.0, 0.0);
-	//glutDisplayFunc(gameStateFunction);
 	chooseScreenCallback();
 	glutKeyboardFunc(KeyboardFunction);
 	glutPassiveMotionFunc(MouseFunction);
