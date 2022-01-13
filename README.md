@@ -1,4 +1,4 @@
-# 3DGameGoBurr
+# 3D Ring Game
 
 This is a 3D C++ game made for a game development course in our 4th year of school.
 The focus of the game was to move around a set field with floating rings and to put your controlled object into the correct ring at each level. 
